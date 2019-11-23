@@ -30,9 +30,30 @@ string Animation = "crab"; //item name
 string Sound     = "ce24d4e3-3394-8712-8dc7-69c812b734c7"; //UUID or item name
 float  Volume    = 1.0; // Volume of sound 0.0 - 1.0
 
+/**
+ * Check if item with a given name exists.
+ *
+ * Goes though the inventory of the item in which the script is operating
+ * checking for an item of a given type and name exists. This is a nescessary
+ * step in ensuring that errors are avoided due to attempts to use an inventory
+ * item does not exist
+ *
+ * Args:
+ *     type: SecondLife constant for inventory type. Expected values
+ *             INVENTORY_ALL       INVENTORY_OBJECT     INVENTORY_NONE
+ *             INVENTORY_TEXTURE   INVENTORY_NOTECARD   INVENTORY_GESTURE
+ *             INVENTORY_SOUND     INVENTORY_SCRIPT     INVENTORY_SETTING
+ *             INVENTORY_LANDMARK  INVENTORY_BODYPART
+ *             INVENTORY_CLOTHING  INVENTORY_ANIMATION
+ *
+ * Returns:
+ *     TRUE (1) if given item was found.
+ *     FALSE(0) if given item was not found.
+ */
+
 integer InventoryExists(integer type, string name){
     integer inventoryItem = llGetInventoryNumber(type);
-    //if the string is a key, we don't need to worry
+    // If the type is sound, and the string is a key we will accept it.
     if (type == INVENTORY_SOUND){
         if ((key)name){
             return TRUE;
@@ -46,6 +67,19 @@ integer InventoryExists(integer type, string name){
     }
     return FALSE;
 }
+
+/**
+ * Checks for files required by this script
+ *
+ * Checks if the items nescessary for this script exist in the inventory of the
+ * item which the script resides in. This is a helper function as this code
+ * needs gets used multiple spots in this script. If more items are needed by
+ * the script, this is where the checks should be handled.
+ *
+ * Returns:
+ *     TRUE (1) if all items required are found
+ *     FALSE(0) if any items are missing.
+ */
 
 integer ItemsExist(){
     if (!InventoryExists(INVENTORY_SOUND, Sound)){
@@ -74,7 +108,7 @@ default
 
     on_rez(integer start_param)
     {
-        //Re-enter the state so we don't have to duplicate state_entry
+        // Re-enter the state so we don't have to duplicate state_entry
         state default;
     }
 
@@ -82,10 +116,10 @@ default
     {
         integer agentWasDetected;
         while(index > 0){
-            //Go through all detected collisions looking for an Agent
+            // Go through all detected collisions looking for an Agent
             if (llDetectedType(--index) & AGENT) agentWasDetected = TRUE;
-            //This would be where modification would be needed to handle
-            //More Agent impacts if they occur.
+            // This would be where modification would be needed to handle
+            // More Agent impacts if they occur.
         }
         if (agentWasDetected){
             llStartAnimation(Animation);  // Play the animation
@@ -134,7 +168,7 @@ state error{
 state permissions{
     state_entry()
     {
-        //If we are here we know we're waiting on permissions
+        // If we are here we know we're waiting on permissions
         llRequestPermissions(llGetOwner(), PERMISSION_TRIGGER_ANIMATION);
     }
 
