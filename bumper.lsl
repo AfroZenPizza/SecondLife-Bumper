@@ -14,6 +14,8 @@
  *           wish to use the LSL Preprocessor. At this time it appears that
  *           Preprocessor is only available on Firestorm
  *           More Info: https://wiki.firestormviewer.org/fs_preprocessor
+ *
+ * Github  : https://github.com/AfroZenPizza/SecondLife-Bumper
  */
 
 #define MAX_FORCE 2147483647.0  // Highest value of a 32bit float
@@ -26,9 +28,9 @@
 #define _strNotAttachedError "For this product to function, it must be attached"
 
 //Set the vairables that are used within the script
-string Animation = "crab"; //item name
-string Sound     = "ce24d4e3-3394-8712-8dc7-69c812b734c7"; //UUID or item name
-float  Volume    = 1.0; // Volume of sound 0.0 - 1.0
+string Animation = "crab"; // Item name
+string Sound     = "ce24d4e3-3394-8712-8dc7-69c812b734c7"; // UUID or item name
+float  Volume    = 1.0;    // Volume of sound 0.0 - 1.0
 
 /**
  * Check if item with a given name exists.
@@ -59,11 +61,10 @@ integer InventoryExists(integer type, string name){
             return TRUE;
         }
     }
-    while (inventoryItem >= 0){
+    while (inventoryItem--){
         if (llGetInventoryName(type, inventoryItem) == name){
             return TRUE;
         }
-        inventoryItem --;
     }
     return FALSE;
 }
@@ -115,12 +116,12 @@ default
     collision_end(integer index)
     {
         integer agentWasDetected;
-        while(index > 0){
+        while(index--){
             // Go through all detected collisions looking for an Agent
-            if (llDetectedType(--index) & AGENT) agentWasDetected = TRUE;
+            if (llDetectedType(index) & AGENT) agentWasDetected = TRUE;
             // This would be where modification would be needed to handle
             // More Agent impacts if they occur.
-        }
+
         if (agentWasDetected){
             llStartAnimation(Animation);  // Play the animation
             llPlaySound(Sound, Volume);   // Then play the sound

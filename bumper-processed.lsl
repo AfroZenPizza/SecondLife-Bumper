@@ -14,14 +14,16 @@
  *
  * Note    : This version is not maintained with the Preprocessor version. It
  *           may have a few differences.
+ *
+ * Github  : https://github.com/AfroZenPizza/SecondLife-Bumper
  */
 
 //Set the vairables that are used within the script
-string Animation = "crab"; //item name
-string Sound     = "ce24d4e3-3394-8712-8dc7-69c812b734c7"; //UUID or item name
-float  Volume    = 1.0; // Volume of sound 0.0 - 1.0
-float RateLimit  = 3.0; // Set this to 0 to disable rate limiting
-float AnimTime   = 2.0; // How long should the animation play
+string Animation = "crab"; // Item name
+string Sound     = "ce24d4e3-3394-8712-8dc7-69c812b734c7"; // UUID or item name
+float  Volume    = 1.0;    // Volume of sound 0.0 - 1.0
+float RateLimit  = 3.0;    // Set this to 0 to disable rate limiting
+float AnimTime   = 2.0;    // How long should the animation play
 
 /**
  * Check if item with a given name exists.
@@ -46,17 +48,16 @@ float AnimTime   = 2.0; // How long should the animation play
 
 integer InventoryExists(integer type, string name){
     integer inventoryItem = llGetInventoryNumber(type);
-    //if the string is a key, we don't need to worry
+    // If the string is a key, we don't need to worry
     if (type == INVENTORY_SOUND){
         if ((key)name){
             return TRUE;
         }
     }
-    while (inventoryItem >= 0){
+    while (inventoryItem--){
         if (llGetInventoryName(type, inventoryItem) == name){
             return TRUE;
         }
-        inventoryItem --;
     }
     return FALSE;
 }
@@ -108,9 +109,9 @@ default
     collision_end(integer index)
     {
         integer agentWasDetected;
-        while(index > 0){
+        while(index--){
             // Go through all detected collisions looking for an Agent
-            if (llDetectedType(--index) & AGENT) agentWasDetected = TRUE;
+            if (llDetectedType(index) & AGENT) agentWasDetected = TRUE;
             // This would be where modification would be needed to handle
             // More Agent impacts if they occur.
         }
