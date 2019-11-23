@@ -78,22 +78,24 @@ default
         state default;
     }
 
-    collision(integer index)
+    collision_end(integer index)
     {
+        integer agentWasDetected;
         while(index > 0){
             //Go through all detected collisions looking for an Agent
-            if (llDetectedType(--index) & AGENT) jump break;
+            if (llDetectedType(--index) & AGENT) agentWasDetected = TRUE;
+            //This would be where modification would be needed to handle
+            //More Agent impacts if they occur.
         }
-        //No agent was found, so leave script
-        return;
-        @break;
-        llStartAnimation(Animation);  // Play the animation
-        llPlaySound(Sound, Volume);   // Then play the sound
-        llSleep(ANIMATION_PLAY_TIME); // Wait for a couple moments
-        llStopAnimation(Animation);   // Stop the Animation
-        #ifdef RATE_LIMITED
-        llSleep(RATE_LIMITED);        // Rate limit the bumper
-        #endif
+        if (agentWasDetected){
+            llStartAnimation(Animation);  // Play the animation
+            llPlaySound(Sound, Volume);   // Then play the sound
+            llSleep(ANIMATION_PLAY_TIME); // Wait for a couple moments
+            llStopAnimation(Animation);   // Stop the Animation
+            #ifdef RATE_LIMITED
+            llSleep(RATE_LIMITED);        // Rate limit the bumper
+            #endif
+        }
     }
 
     changed(integer change)
