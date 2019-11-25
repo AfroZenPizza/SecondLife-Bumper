@@ -22,6 +22,8 @@
 #define RATE_LIMITED 3          // Undef RATE_LIMITED to disable (must be secs)
 #define ANIMATION_PLAY_TIME 2.0 // How long should the animation play
 
+// Constants to be used with Bitwise checks within the script.
+// These constants must be powers of 2 (1,2,4,8,16...)
 #define CollisionCooldown 0x1   // Will be used bitwise to. 0x just for clarity
 #define AnimationPlaying  0x2   // Checks to see if animation is playing
 
@@ -35,9 +37,9 @@ string Animation = "crab"; // Item name
 string Sound     = "ce24d4e3-3394-8712-8dc7-69c812b734c7"; // UUID or item name
 float  Volume    = 1.0;    // Volume of sound 0.0 - 1.0
 
-integer Checks;
-integer CooldownEnd;
-
+// Variables used internally. These should not be set during initialization
+integer Checks;      //Contains bitwise constants for determining events
+integer CooldownEnd; //When the cooldown should end. Set with llGetUnixTime()
 
 /**
  * Check if item with a given name exists.

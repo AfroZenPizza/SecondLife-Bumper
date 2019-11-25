@@ -25,8 +25,10 @@ float  Volume    = 1.0;    // Volume of sound 0.0 - 1.0
 float AnimTime   = 2.0;    // How long should the animation play
 integer RateLimit  = 3;    // Set this to 0 to disable rate limiting
 
-integer Checks;
-integer CooldownEnd;
+// Variables used internally. These should not be set during initialization
+integer Checks;      //Contains bitwise constants for determining events
+integer CooldownEnd; //When the cooldown should end. Set with llGetUnixTime()
+
 /**
  * Check if item with a given name exists.
  *
