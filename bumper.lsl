@@ -66,8 +66,8 @@ integer InventoryExists(integer type, string name){
     integer inventoryItem = llGetInventoryNumber(type);
     // If the type is sound, and the string is a key we will accept it.
     if (type == INVENTORY_SOUND){
-        if ((key)name){
-            return TRUE;
+        if ((key)name){  // When doing if check on a key it will reutrn true if
+            return TRUE; // valid. Note: !(key) will not function. (Trick)
         }
     }
     while (inventoryItem--){
