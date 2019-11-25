@@ -22,9 +22,11 @@
 string Animation = "crab"; // Item name
 string Sound     = "ce24d4e3-3394-8712-8dc7-69c812b734c7"; // UUID or item name
 float  Volume    = 1.0;    // Volume of sound 0.0 - 1.0
-float RateLimit  = 3.0;    // Set this to 0 to disable rate limiting
 float AnimTime   = 2.0;    // How long should the animation play
+integer RateLimit  = 3;    // Set this to 0 to disable rate limiting
 
+integer Checks;
+integer CooldownEnd;
 /**
  * Check if item with a given name exists.
  *
@@ -108,6 +110,8 @@ default
 
     collision_end(integer index)
     {
+        if (0x1 & Checks) return; // We're in cooldown
+        Checks = Checks | 0x1;
         integer agentWasDetected;
         while(index--){
             // Go through all detected collisions looking for an Agent
@@ -116,12 +120,28 @@ default
             // More Agent impacts if they occur.
         }
         if (agentWasDetected){
-            llStartAnimation(Animation);  // Play the animation
-            llPlaySound(Sound, Volume);   // Then play the sound
-            llSleep(AnimTime);            // Wait for a couple moments
-            llStopAnimation(Animation);   // Stop the Animation
-            if (RateLimit != 0.0){
-                llSleep(RateLimit);       // Rate limit the bumper
+            if (agentWasDetected){
+                llStartAnimation(Animation);           // Play the animation
+                Checks = Checks | 0x2;                 // Set the animation bit
+                llPlaySound(Sound, Volume);            // Then play the sound
+                llSetTimerEvent(AnimTime);             // Wait for a moment
+                CooldownEnd = llGetUnixTime() + RateLimit;
+            }
+        }
+    }
+
+    timer()
+    {
+        llSetTimerEvent(0.0);
+        if (CooldownEnd < llGetUnixTime()){
+            //End Collision Cooldown and allow Collisions to occur again
+            Checks = Checks & ~0x1;
+        }
+        if (Checks & 0x2){
+            llStopAnimation(Animation);
+            Checks = Checks & ~0x2;
+            if (CooldownEnd > llGetUnixTime()){
+                llSetTimerEvent(CooldownEnd - llGetUnixTime());
             }
         }
     }

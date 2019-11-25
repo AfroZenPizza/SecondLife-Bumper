@@ -19,8 +19,11 @@
  */
 
 #define MAX_FORCE 2147483647.0  // Highest value of a 32bit float
-#define RATE_LIMITED 3.0        // Undef RATE_LIMITED to disable
+#define RATE_LIMITED 3          // Undef RATE_LIMITED to disable (must be secs)
 #define ANIMATION_PLAY_TIME 2.0 // How long should the animation play
+
+#define CollisionCooldown 0x1   // Will be used bitwise to. 0x just for clarity
+#define AnimationPlaying  0x2   // Checks to see if animation is playing
 
 //Strings used within the script. Should be descriptive enough.
 #define _strAnimationNotFound "Animation was not found"
@@ -31,6 +34,10 @@
 string Animation = "crab"; // Item name
 string Sound     = "ce24d4e3-3394-8712-8dc7-69c812b734c7"; // UUID or item name
 float  Volume    = 1.0;    // Volume of sound 0.0 - 1.0
+
+integer Checks;
+integer CooldownEnd;
+
 
 /**
  * Check if item with a given name exists.
@@ -115,21 +122,42 @@ default
 
     collision_end(integer index)
     {
+        if (CollisionCooldown & Checks) return; // We're in cooldown
+        Checks = Checks | CollisionCooldown;
         integer agentWasDetected;
         while(index--){
             // Go through all detected collisions looking for an Agent
             if (llDetectedType(index) & AGENT) agentWasDetected = TRUE;
             // This would be where modification would be needed to handle
             // More Agent impacts if they occur.
-
+        }
         if (agentWasDetected){
-            llStartAnimation(Animation);  // Play the animation
-            llPlaySound(Sound, Volume);   // Then play the sound
-            llSleep(ANIMATION_PLAY_TIME); // Wait for a couple moments
-            llStopAnimation(Animation);   // Stop the Animation
+            llStartAnimation(Animation);           // Play the animation
+            Checks = Checks | AnimationPlaying;    // Set the animation bit
+            llPlaySound(Sound, Volume);            // Then play the sound
+            llSetTimerEvent(ANIMATION_PLAY_TIME);  // Wait for a couple moments
             #ifdef RATE_LIMITED
-            llSleep(RATE_LIMITED);        // Rate limit the bumper
+            // Rate limit the bumper
+            CooldownEnd = llGetUnixTime() + RATE_LIMITED;
+            #else
+            CooldownEnd = llGetUnixTime();
             #endif
+        }
+    }
+
+    timer()
+    {
+        llSetTimerEvent(0.0);
+        if (CooldownEnd < llGetUnixTime()){
+            //End Collision Cooldown and allow Collisions to occur again
+            Checks = Checks & ~CollisionCooldown;
+        }
+        if (Checks & AnimationPlaying){
+            llStopAnimation(Animation);
+            Checks = Checks & ~AnimationPlaying;
+            if (CooldownEnd > llGetUnixTime()){
+                llSetTimerEvent(CooldownEnd - llGetUnixTime());
+            }
         }
     }
 
