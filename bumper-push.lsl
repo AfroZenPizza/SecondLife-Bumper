@@ -125,7 +125,6 @@ default
     collision_end(integer index)
     {
         if (CollisionCooldown & Checks) return; // We're in cooldown
-        Checks = Checks | CollisionCooldown;
         integer agentWasDetected;
         while(index--){
             // Go through all detected collisions looking for an Agent
@@ -141,6 +140,7 @@ default
             // More Agent impacts if they occur.
         }
         if (agentWasDetected){
+            Checks = Checks | CollisionCooldown;
             llStartAnimation(Animation);           // Play the animation
             llPlaySound(Sound, Volume);            // Then play the sound
             llSetTimerEvent(ANIMATION_PLAY_TIME);  // Wait for a couple moments

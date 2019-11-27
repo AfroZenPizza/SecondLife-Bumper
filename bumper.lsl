@@ -122,10 +122,9 @@ default
         state default;
     }
 
-    collision_end(integer index)
+    collision_start(integer index)
     {
         if (CollisionCooldown & Checks) return; // We're in cooldown
-        Checks = Checks | CollisionCooldown;
         integer agentWasDetected;
         while(index--){
             // Go through all detected collisions looking for an Agent
@@ -134,6 +133,7 @@ default
             // More Agent impacts if they occur.
         }
         if (agentWasDetected){
+            Checks = Checks | CollisionCooldown;
             llStartAnimation(Animation);           // Play the animation
             Checks = Checks | AnimationPlaying;    // Set the animation bit
             llPlaySound(Sound, Volume);            // Then play the sound
@@ -152,13 +152,13 @@ default
         llSetTimerEvent(0.0);
         if (CooldownEnd < llGetUnixTime()){
             //End Collision Cooldown and allow Collisions to occur again
-            Checks = Checks & ~CollisionCooldown;
+            Checks = Checks & ~CollisionCooldown;            
         }
         if (Checks & AnimationPlaying){
             llStopAnimation(Animation);
             Checks = Checks & ~AnimationPlaying;
             if (CooldownEnd > llGetUnixTime()){
-                llSetTimerEvent(CooldownEnd - llGetUnixTime());
+                llSetTimerEvent((float)(CooldownEnd - llGetUnixTime()));
             }
         }
     }
